@@ -1,4 +1,4 @@
 extends Node
 
-var max_health = 10
-var current_health = 9
+var max_health = 8
+var current_health = 6
