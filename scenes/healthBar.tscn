@@ -1,0 +1,132 @@
+[gd_scene load_steps=7 format=3 uid="uid://bmo4252s7qsbs"]
+
+[ext_resource type="Script" uid="uid://brq31lqyv0osu" path="res://scripts/healthBar.gd" id="1_0vr2f"]
+[ext_resource type="Texture2D" uid="uid://bf28kjlxrrp2a" path="res://assets/gui/3 Icons/Icon_42.png" id="1_spvli"]
+[ext_resource type="Texture2D" uid="uid://cx1atatd78lkj" path="res://assets/gui/2 Buttons/ButtonsMap.png" id="2_0vr2f"]
+[ext_resource type="Texture2D" uid="uid://cnubronw7smrm" path="res://assets/gui/4 Bars/health.png" id="3_r72rs"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aiha7"]
+texture = ExtResource("2_0vr2f")
+separation = Vector2i(2, 2)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+7:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_hbab8"]
+sources/0 = SubResource("TileSetAtlasSource_aiha7")
+
+[node name="HealthBar" type="Node2D" node_paths=PackedStringArray("segment_sprites")]
+script = ExtResource("1_0vr2f")
+segment_sprites = [NodePath("segment1"), NodePath("segment2"), NodePath("segment3"), NodePath("segment4"), NodePath("segment5"), NodePath("segment6"), NodePath("segment7"), NodePath("segment8"), NodePath("segment9"), NodePath("segment10"), NodePath("segment11"), NodePath("segment12")]
+
+[node name="heart" type="Sprite2D" parent="."]
+modulate = Color(1, 0, 0, 1)
+z_index = 1
+position = Vector2(16, 16)
+texture = ExtResource("1_spvli")
+
+[node name="heartBox" type="TileMapLayer" parent="."]
+position = Vector2(24, -8)
+tile_map_data = PackedByteArray(0, 0, 255, 255, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0)
+tile_set = SubResource("TileSet_hbab8")
+
+[node name="segment1" type="Sprite2D" parent="."]
+position = Vector2(32, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment2" type="Sprite2D" parent="."]
+position = Vector2(48, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment3" type="Sprite2D" parent="."]
+position = Vector2(64, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment4" type="Sprite2D" parent="."]
+position = Vector2(80, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment5" type="Sprite2D" parent="."]
+position = Vector2(96, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment6" type="Sprite2D" parent="."]
+position = Vector2(112, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment7" type="Sprite2D" parent="."]
+position = Vector2(128, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment8" type="Sprite2D" parent="."]
+position = Vector2(144, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment9" type="Sprite2D" parent="."]
+position = Vector2(160, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment10" type="Sprite2D" parent="."]
+position = Vector2(176, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment11" type="Sprite2D" parent="."]
+position = Vector2(192, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11
+
+[node name="segment12" type="Sprite2D" parent="."]
+position = Vector2(208, 16)
+texture = ExtResource("3_r72rs")
+hframes = 12
+frame = 11

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://drrr242lq0cr2"]
+[gd_scene load_steps=20 format=3 uid="uid://drrr242lq0cr2"]
 
 [ext_resource type="Script" uid="uid://bn01bmoji0no4" path="res://scripts/player.gd" id="1_fjrip"]
 [ext_resource type="Texture2D" uid="uid://vkffon8ggbu1" path="res://assets/characters/2/D_Idle.png" id="2_smehm"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://1q785en3keoc" path="res://assets/characters/2/D_Walk.png" id="5_d2wvv"]
 [ext_resource type="Texture2D" uid="uid://oa8bf74e0reh" path="res://assets/characters/2/U_Walk.png" id="6_3v2ag"]
 [ext_resource type="Texture2D" uid="uid://dukqdb5s34pw0" path="res://assets/characters/2/S_Walk.png" id="7_jej6c"]
+[ext_resource type="PackedScene" uid="uid://bmo4252s7qsbs" path="res://scenes/healthBar.tscn" id="8_smehm"]
 
 [sub_resource type="Animation" id="Animation_f1ej7"]
 resource_name = "idle_down"
@@ -448,6 +449,9 @@ _data = {
 &"walk_up": SubResource("Animation_60mlk")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fjrip"]
+size = Vector2(10, 13)
+
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_fjrip")
 
@@ -461,3 +465,10 @@ libraries = {
 }
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_fjrip")
+
+[node name="HealthBar" parent="." instance=ExtResource("8_smehm")]
+position = Vector2(-320, -176)
