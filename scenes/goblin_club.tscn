@@ -1062,8 +1062,10 @@ wait_time = 0.4
 wait_time = 0.21
 
 [node name="HurtTimer" type="Timer" parent="."]
+wait_time = 0.3
 
 [node name="DyingTimer" type="Timer" parent="."]
+wait_time = 0.1
 
 [node name="DeathTimer" type="Timer" parent="."]
 

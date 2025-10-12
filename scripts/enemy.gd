@@ -153,12 +153,14 @@ func attack(body):
 
 
 func hurt(value):
+	
 	if !dying and !dead and !hurting:
 		pendingDamage = value
 		if hit_points == null:
 			hit_points = 0
 		var newHP = hit_points - pendingDamage
 		if newHP <= 0:
+			$AnimationPlayer.stop()
 			die()
 		else:
 			hurting = true
