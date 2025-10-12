@@ -36,6 +36,17 @@ func _ready():
 	$RespawnTimer.timeout.connect(_on_respawn_timer_timeout)
 	original_position = global_position
 	respawn_time = 10
+	threatened = false
+	attacking = false
+	hurting = false
+	dying = false
+	dead = false
+	is_chasing = false
+	is_returning = false
+	up = false
+	down = true
+	left = false
+	right = false
 	
 	
 func _process(delta):
@@ -310,8 +321,8 @@ func deactivate_enemy():
 	hide()
 	set_process(false)
 	set_physics_process(false)
-	$HitBox.monitoring = true
-	$HitBox.set_deferred("monitorable", true)
+	$HitBox.monitoring = false
+	$HitBox.set_deferred("monitorable", false)
 	$HitBox/CollisionShape2D.disabled = true
 	$CollisionShape2D.disabled = true
 	$HitBox/CollisionShape2D.set_deferred("disabled", true)
@@ -320,12 +331,12 @@ func reactivate_enemy():
 	show()
 	set_process(true)
 	set_physics_process(true)
-	$HitBox.monitoring = false
-	$HitBox.set_deferred("monitorable", false)
+	$HitBox.monitoring = true
+	$HitBox.set_deferred("monitorable", true)
 	$HitBox/CollisionShape2D.disabled = false
 	$CollisionShape2D.disabled = false
 	$HitBox/CollisionShape2D.set_deferred("disabled", false)
-	$AnimationPlayer.stop()
+	$AnimationPlayer.play("idle_down")
 
 
 # TIMER TIMEOUTS -----------------------------------------------------------------------------------

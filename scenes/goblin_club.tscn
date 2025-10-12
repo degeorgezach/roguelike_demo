@@ -1065,7 +1065,7 @@ wait_time = 0.21
 wait_time = 0.3
 
 [node name="DyingTimer" type="Timer" parent="."]
-wait_time = 0.1
+wait_time = 0.05
 
 [node name="DeathTimer" type="Timer" parent="."]
 
