@@ -155,6 +155,8 @@ func attack(body):
 func hurt(value):
 	if !dying and !dead and !hurting:
 		pendingDamage = value
+		if hit_points == null:
+			hit_points = 0
 		var newHP = hit_points - pendingDamage
 		if newHP <= 0:
 			die()
@@ -176,7 +178,7 @@ func hurt(value):
 
 func die():
 	if !dying:
-		GlobalData.Player.gain_exp(xp)
+		#GlobalData.Player.gain_exp(xp)
 		dying = true
 		$DeathTimer.start()
 		$DyingTimer.start()
@@ -342,11 +344,11 @@ func _on_death_timer_timeout():
 	dead = true
 	$DeathTimer.stop()
 	
-	if randf() <= gold_drop_chance:
-		var gold_scene = load("res://scenes/pickups/gold.tscn")
-		var gold_instance = gold_scene.instantiate()
-		gold_instance.position = position  # Place it where the enemy died
-		get_parent().add_child(gold_instance)
+	#if randf() <= gold_drop_chance:
+		#var gold_scene = load("res://scenes/pickups/gold.tscn")
+		#var gold_instance = gold_scene.instantiate()
+		#gold_instance.position = position  # Place it where the enemy died
+		#get_parent().add_child(gold_instance)
 		
 	#queue_free()
 	$RespawnTimer.wait_time = respawn_time

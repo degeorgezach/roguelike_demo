@@ -19,6 +19,11 @@ var dead = false
 var input = Vector2.ZERO
 var move_speed = 48
 var inputting_movement = false
+var idling = true
+
+var enemies = []
+var threatened = false
+var attack_power = 1
 
 
 func _ready():
@@ -128,13 +133,55 @@ func _physics_process(delta):
 		#stamina_ticking = true
 		#$StaminaTickTimer.start()
 
-func attack() -> void:
-	attacking = true
-	anim.play("attack_" + last_direction)
-	
-	# You can call this from the animation end instead if you prefer
-	await get_tree().create_timer(attack_duration).timeout
-	attacking = false
+	if Input.is_action_just_released("attack"):
+			if !attacking and !attacking2:
+				idling = false
+				if enemies == null or enemies.size() == 0:
+					attacking = true
+					$AttackTimer.start()
+					if down:
+						$AnimationPlayer.play("attack_down")
+					if left:
+						$AnimationPlayer.play("attack_left")
+					if right:
+						$AnimationPlayer.play("attack_right")
+					if up:
+						$AnimationPlayer.play("attack_up")
+				else:
+					attack(enemies[0])
+
+func attack(body):
+	if !attacking and !dying:
+		attacking = true
+		$AttackTimer.start()
+		$AttackMidSwingTimer.start()
+		var direction = body.global_position - global_position
+		if abs(direction.x) > abs(direction.y):
+			if direction.x > 0:
+				down = false
+				up = false
+				right = true
+				left = false
+				$AnimationPlayer.play("attack_right")
+			else:
+				down = false
+				up = false
+				right = false
+				left = true
+				$AnimationPlayer.play("attack_left")
+		else:
+			if direction.y > 0:
+				down = true
+				up = false
+				right = false
+				left = false
+				$AnimationPlayer.play("attack_down")
+			else:
+				down = false
+				up = true
+				right = false
+				left = false
+				$AnimationPlayer.play("attack_up")
 
 
 
@@ -143,15 +190,6 @@ func attack() -> void:
 
 
 func player_movement(_delta):
-	#if moving_to_click:
-		#var direction = (destination - global_position).normalized()
-		#velocity = direction * move_speed
-#
-		## Stop moving if close enough
-		#if global_position.distance_to(destination) < 4:
-			#velocity = Vector2.ZERO
-			#moving_to_click = false
-	#else:
 	input = get_input()
 	velocity = input * move_speed
 	move_and_slide()
@@ -161,7 +199,6 @@ func get_input():
 	input.y = int(Input.is_action_pressed("down")) - int(Input.is_action_pressed("up"))
 	inputting_movement = input != Vector2.ZERO
 	return input.normalized()
-
 
 
 func hurt(value):
@@ -205,3 +242,29 @@ func _on_death_timer_timeout():
 	GlobalData.hit_points = GlobalData.max_health
 	queue_free()
 	get_tree().change_scene_to_file("res://scenes/test.tscn")
+
+
+func _on_attack_timer_timeout():
+	$AttackTimer.stop()
+	attacking = false
+	idling = true
+
+
+func _on_attack_mid_swing_timer_timeout():
+	if enemies != null and threatened:
+		enemies[0].hit_points = enemies[0].hurt(attack_power)
+	$AttackMidSwingTimer.stop()
+
+
+func _on_hit_box_body_entered(body):
+	if body is Enemy:
+		threatened = true
+		enemies.append(body)
+
+
+func _on_hit_box_body_exited(body):
+	if body is Enemy:
+		if enemies.has(body):
+			enemies.erase(body)
+		if enemies.size() == 0:
+			threatened = false
