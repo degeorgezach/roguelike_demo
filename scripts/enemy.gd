@@ -43,10 +43,6 @@ func _ready():
 	dead = false
 	is_chasing = false
 	is_returning = false
-	up = false
-	down = true
-	left = false
-	right = false
 	
 	
 func _process(delta):
@@ -78,7 +74,7 @@ func _process(delta):
 			left = false
 			is_chasing = false
 			is_returning = false
-			$AnimationPlayer.play("idle_down")
+			is_returning = false
 			
 		if is_chasing:
 			chase_player(delta)
@@ -94,8 +90,6 @@ func _process(delta):
 			$AnimationPlayer.play("idle_left")
 		elif up:
 			$AnimationPlayer.play("idle_up")
-		else:
-			$AnimationPlayer.play("idle_down")
 			
 	if GlobalData.hit_points <= 0 and !dead and !dying:
 		if !is_returning:
@@ -336,6 +330,7 @@ func reactivate_enemy():
 	$HitBox/CollisionShape2D.disabled = false
 	$CollisionShape2D.disabled = false
 	$HitBox/CollisionShape2D.set_deferred("disabled", false)
+	down = true
 	$AnimationPlayer.play("idle_down")
 
 
