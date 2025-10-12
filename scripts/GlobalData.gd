@@ -1,4 +1,7 @@
 extends Node
 
+
+var Player
+
 var max_health = 8
-var current_health = 6
+var hit_points = 6

@@ -19,24 +19,24 @@ func update_health_bar() -> void:
 		var sprite := segment_sprites[i]
 
 		# Special case: single segment filled
-		if GlobalData.current_health == 1 and i == 0:
+		if GlobalData.hit_points == 1 and i == 0:
 			sprite.frame = FRAME_FULL_SINGLE
 			continue
 
 		# Left edge
 		if i == 0:
-			sprite.frame = FRAME_FULL_LEFT if GlobalData.current_health > 0 else FRAME_EMPTY_LEFT
+			sprite.frame = FRAME_FULL_LEFT if GlobalData.hit_points > 0 else FRAME_EMPTY_LEFT
 			continue
 
 		# Right edge
 		if i == GlobalData.max_health - 1:
-			sprite.frame = FRAME_FULL_RIGHT if GlobalData.current_health > i else FRAME_EMPTY_RIGHT
+			sprite.frame = FRAME_FULL_RIGHT if GlobalData.hit_points > i else FRAME_EMPTY_RIGHT
 			continue
 
 		# The "end" of current health (the rightmost filled segment)
-		if i == GlobalData.current_health - 1 and GlobalData.current_health < GlobalData.max_health:
+		if i == GlobalData.hit_points - 1 and GlobalData.hit_points < GlobalData.max_health:
 			sprite.frame = FRAME_FULL_RIGHT
 			continue
 
 		# Middle segments
-		sprite.frame = FRAME_FULL_MID if GlobalData.current_health > i else FRAME_EMPTY_MID
+		sprite.frame = FRAME_FULL_MID if GlobalData.hit_points > i else FRAME_EMPTY_MID
