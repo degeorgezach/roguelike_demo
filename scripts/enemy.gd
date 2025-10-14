@@ -44,7 +44,17 @@ func _ready():
 	is_chasing = false
 	is_returning = false
 	
+	var directions = ["up", "down", "left", "right"]
+	var chosen_direction = directions[randi() % directions.size()]	
+	up = false
+	down = false
+	left = false
+	right = false
 	
+	set(chosen_direction, true)
+	$AnimationPlayer.play("idle_" + chosen_direction)
+
+
 func _process(delta):
 	if GlobalData.Player != null:
 		if threatened and !attacking and !hurting and !dying and !dead and GlobalData.hit_points > 0:

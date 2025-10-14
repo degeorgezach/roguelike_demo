@@ -205,6 +205,7 @@ func hurt(value):
 	if !attacking and !attacking2 and !hurting and !dying and !dead:
 		hurting = true
 		$HurtTimer.start()
+		$Camera2D.shake(0.6)  # smaller = more subtle, larger = stronger
 		if down:
 			$AnimationPlayer.play("hurt_down")
 		if left:

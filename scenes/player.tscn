@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://drrr242lq0cr2"]
+[gd_scene load_steps=43 format=3 uid="uid://drrr242lq0cr2"]
 
 [ext_resource type="Script" uid="uid://bn01bmoji0no4" path="res://scripts/player.gd" id="1_fjrip"]
 [ext_resource type="Texture2D" uid="uid://vkffon8ggbu1" path="res://assets/characters/2/D_Idle.png" id="2_smehm"]
@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://b88axd6f0ncws" path="res://assets/characters/2/D_Death.png" id="14_60mlk"]
 [ext_resource type="Texture2D" uid="uid://t4chx2lhj6oi" path="res://assets/characters/2/U_Death.png" id="15_i4ail"]
 [ext_resource type="Texture2D" uid="uid://fr8g8msitkby" path="res://assets/characters/2/S_Death.png" id="16_a38lo"]
+[ext_resource type="Script" uid="uid://vm7kmovdk3vr" path="res://scripts/camera_2d.gd" id="17_fulsm"]
 
 [sub_resource type="Animation" id="Animation_oprun"]
 length = 0.001
@@ -1041,6 +1042,7 @@ libraries = {
 }
 
 [node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("17_fulsm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -0.5)

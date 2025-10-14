@@ -3,8 +3,6 @@ extends Enemy
 
 func _ready():
 	super._ready()
-	$AnimationPlayer.play("idle_down")
-	down = true
 	original_position = global_position
 	hit_points = 4
 	max_hit_points = hit_points
