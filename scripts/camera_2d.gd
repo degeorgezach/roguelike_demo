@@ -2,7 +2,7 @@ extends Camera2D
 
 var shake_strength: float = 0.0
 var shake_decay: float = 5.0  # how fast the shake fades out
-var shake_amount: float = 2.0 # maximum pixel offset
+var shake_amount: float = 1.0 # maximum pixel offset
 
 func _process(delta: float) -> void:
 	if shake_strength > 0:

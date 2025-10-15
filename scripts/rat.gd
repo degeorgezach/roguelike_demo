@@ -7,6 +7,6 @@ func _ready():
 	hit_points = 2
 	max_hit_points = hit_points
 	xp = 40
-	#move_speed = 96
+	move_speed = 32
 	detection_radius  = 64
 	detection_radius_min = 16

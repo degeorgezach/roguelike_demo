@@ -214,7 +214,7 @@ func hurt(value):
 			$AnimationPlayer.play("hurt_right")
 		if up:
 			$AnimationPlayer.play("hurt_up")
-	GlobalData.hit_points -= value
+		GlobalData.hit_points -= value
 
 
 func die():

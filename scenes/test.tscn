@@ -115,6 +115,9 @@ polygon = PackedVector2Array(336, 176, 448, 176, 448, 32, 240, 32, 240, 112, 224
 [node name="Goblin_Club" parent="." instance=ExtResource("4_74lek")]
 position = Vector2(432, 160)
 
+[node name="Goblin_Club2" parent="." instance=ExtResource("4_74lek")]
+position = Vector2(248, 136)
+
 [node name="Rat" parent="." instance=ExtResource("5_j5jx5")]
 position = Vector2(432, 48)
 
