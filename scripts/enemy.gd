@@ -30,12 +30,12 @@ var gold_drop_chance = 0.25
 var attack_power = 1
 var hit_margin = 16
 var arrow_direction 
-var respawn_time = 30
+var respawn_time = 0
 
 func _ready():
 	$RespawnTimer.timeout.connect(_on_respawn_timer_timeout)
 	original_position = global_position
-	respawn_time = 10
+	respawn_time = 100000000
 	threatened = false
 	attacking = false
 	hurting = false
@@ -285,7 +285,8 @@ func hurt(value):
 func die():
 	if dying or dead:
 		return
-		
+			
+	$CollisionShape2D.disabled = true
 	dying = true
 	hurting = false
 	attacking = false

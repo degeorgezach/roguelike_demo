@@ -112,20 +112,27 @@ polygon = PackedVector2Array(0, 0, 0, 144, 80, 144, 80, 128, 16, 128, 16, 16, 14
 [node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(336, 176, 448, 176, 448, 32, 240, 32, 240, 112, 224, 112, 224, 192, 96, 192, 96, 144, 112, 144, 112, 176, 208, 176, 208, 96, 224, 96, 224, 16, 464, 16, 464, 192, 352, 192, 352, 240, 304, 240, 304, 272, 288, 272, 288, 224, 336, 224)
 
+[node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="."]
+position = Vector2(248, 136)
+polygon = PackedVector2Array(-184, 8, -184, 104, -8, 104, -8, 184, 312, 184, 312, 72, 408, 72, 408, -56, 360, -56, 360, -72, 408, -72, 408, -184, 88, -184, 88, -248, -72, -248, -72, -136, 248, -136, 248, -72, 296, -72, 296, -56, 248, -56, 248, 120, 56, 120, 56, 136, 264, 136, 264, -40, 312, -40, 312, -88, 264, -88, 264, -152, -56, -152, -56, -232, 72, -232, 72, -168, 392, -168, 392, -88, 344, -88, 344, -40, 392, -40, 392, 56, 296, 56, 296, 168, 8, 168, 8, 88, -168, 88, -168, 8)
+
 [node name="Goblin_Club" parent="." instance=ExtResource("4_74lek")]
 position = Vector2(432, 160)
 
 [node name="Goblin_Club2" parent="." instance=ExtResource("4_74lek")]
 position = Vector2(248, 136)
 
+[node name="Goblin_Club3" parent="." instance=ExtResource("4_74lek")]
+position = Vector2(128, 56)
+
 [node name="Rat" parent="." instance=ExtResource("5_j5jx5")]
 position = Vector2(432, 48)
 
 [node name="Rat2" parent="." instance=ExtResource("5_j5jx5")]
-position = Vector2(264, 48)
+position = Vector2(40, 40)
 
 [node name="Rat3" parent="." instance=ExtResource("5_j5jx5")]
-position = Vector2(416, 72)
+position = Vector2(272, 56)
 
 [node name="Rat4" parent="." instance=ExtResource("5_j5jx5")]
-position = Vector2(392, 48)
+position = Vector2(272, 280)
