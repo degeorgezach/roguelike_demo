@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=4 uid="uid://dxv2ysyox0vtw"]
+[gd_scene load_steps=7 format=4 uid="uid://dxv2ysyox0vtw"]
 
 [ext_resource type="PackedScene" uid="uid://drrr242lq0cr2" path="res://scenes/player.tscn" id="1_errlg"]
 [ext_resource type="Script" uid="uid://6etu4wnxjsqn" path="res://scripts/test.gd" id="1_iyx0m"]
 [ext_resource type="Texture2D" uid="uid://cis552r260vu2" path="res://assets/tileset/1 Tiles/Tileset.png" id="2_bl13t"]
+[ext_resource type="PackedScene" uid="uid://derahvo7471f8" path="res://scenes/rat.tscn" id="5_j5jx5"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_iyx0m"]
 texture = ExtResource("2_bl13t")
@@ -113,3 +114,6 @@ polygon = PackedVector2Array(336, 176, 448, 176, 448, 32, 240, 32, 240, 112, 224
 [node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="."]
 position = Vector2(248, 136)
 polygon = PackedVector2Array(-184, 8, -184, 104, -8, 104, -8, 184, 312, 184, 312, 72, 408, 72, 408, -56, 360, -56, 360, -72, 408, -72, 408, -184, 88, -184, 88, -248, -72, -248, -72, -136, 248, -136, 248, -72, 296, -72, 296, -56, 248, -56, 248, 120, 56, 120, 56, 136, 264, 136, 264, -40, 312, -40, 312, -88, 264, -88, 264, -152, -56, -152, -56, -232, 72, -232, 72, -168, 392, -168, 392, -88, 344, -88, 344, -40, 392, -40, 392, 56, 296, 56, 296, 168, 8, 168, 8, 88, -168, 88, -168, 8)
+
+[node name="Rat" parent="." groups=["Enemies"] instance=ExtResource("5_j5jx5")]
+position = Vector2(360, 40)

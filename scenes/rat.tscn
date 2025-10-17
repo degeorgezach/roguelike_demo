@@ -17,8 +17,8 @@
 [ext_resource type="Texture2D" uid="uid://48fmjqpvvrpf" path="res://assets/enemies/1/U_Death.png" id="16_lc5fw"]
 [ext_resource type="Texture2D" uid="uid://tb0jj5mdeisk" path="res://assets/enemies/1/S_Death.png" id="17_q32c2"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_3csnj"]
-radius = 7.07107
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u8fq5"]
+size = Vector2(16, 16)
 
 [sub_resource type="Animation" id="Animation_acf8p"]
 length = 0.001
@@ -1242,7 +1242,7 @@ texture = ExtResource("2_acf8p")
 hframes = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_3csnj")
+shape = SubResource("RectangleShape2D_u8fq5")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
