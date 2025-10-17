@@ -1,267 +1,207 @@
 extends CharacterBody2D
-
 class_name Player
 
-@export var speed: float = 60.0
-@onready var anim: AnimationPlayer = $AnimationPlayer
+@export var tile_size: int = 16
+@export var move_speed: float = 128.0  # pixels/sec
 @export var attack_duration: float = 0.4
-var attacking: bool = false
-var last_direction: String = "down"
 
-var up = false
-var down = false
-var left = false
-var right = false
-var attacking2 = false
-var hurting = false
-var dying = false
-var dead = false
-var input = Vector2.ZERO
-var move_speed = 48
-var inputting_movement = false
+@onready var anim: AnimationPlayer = $AnimationPlayer
+
+var moving = false
+var target_position: Vector2
+var direction = Vector2.ZERO
+
+var attacking = false
 var idling = true
-
 var enemies = []
 var threatened = false
 var attack_power = 1
 
+# Direction flags
+var up = false
+var down = true
+var left = false
+var right = false
+
+var dead = false
 
 func _ready():
-	$AnimationPlayer.play("idle_down")
-	down = true
-	
+	anim.play("idle_down")
+	target_position = global_position
 
 func _physics_process(delta):
 	if GlobalData.hit_points <= 0:
 		die()
-	if !attacking and !attacking2 and !dying and !dead:
-		player_movement(delta)
+	
+	if not moving and not attacking and not dead:
+		handle_input()
 
-		if !hurting:
-			if velocity.length() > 0:
-				# Set direction flags based on velocity
-				if abs(velocity.x) > abs(velocity.y):
-					if velocity.x > 0:
-						$AnimationPlayer.play("walk_right")
-						right = true
-						left = false
-						up = false
-						down = false
-					else:
-						$AnimationPlayer.play("walk_left")
-						left = true
-						right = false
-						up = false
-						down = false
-				else:
-					if velocity.y > 0:
-						$AnimationPlayer.play("walk_down")
-						down = true
-						up = false
-						left = false
-						right = false
-					else:
-						$AnimationPlayer.play("walk_up")
-						up = true
-						down = false
-						left = false
-						right = false
-			else:
-				if down:
-					$AnimationPlayer.play("idle_down")
-				elif right:
-					$AnimationPlayer.play("idle_right")
-				elif left:
-					$AnimationPlayer.play("idle_left")
-				elif up:
-					$AnimationPlayer.play("idle_up")
+	if moving:
+		move_towards_target(delta)
+	else:
+		update_idle_animation()
 
-	#var autoAttack = false
-	#if GlobalData.AutoRetaliate and enemies != null and enemies.size() > 0 and !inputting_movement:
-		#var first_enemy = enemies[0]
-		#if first_enemy != null and first_enemy.hit_points != null and first_enemy.hit_points > 0:
-			#autoAttack = true
+func handle_input():
+	# Only act on new key presses (turn-based)
+	var input_vector = Vector2(
+		int(Input.is_action_just_pressed("right")) - int(Input.is_action_just_pressed("left")),
+		int(Input.is_action_just_pressed("down")) - int(Input.is_action_just_pressed("up"))
+	)
+	
+	if input_vector != Vector2.ZERO:
+		direction = input_vector
+		try_move_tile(direction)
+	
+	if Input.is_action_just_pressed("attack") and not attacking:
+		attack_action()
+
+func try_move_tile(dir: Vector2):
+	var next_pos = global_position + dir * tile_size
+
+	# Godot 4 ray collision
+	var query = PhysicsRayQueryParameters2D.new()
+	query.from = global_position
+	query.to = next_pos
+	query.exclude = [self]
+	query.collide_with_bodies = true
+	query.collide_with_areas = false
+	query.collision_mask = 0x7FFFFFFF
+
+	var space_state = get_world_2d().direct_space_state
+	var result = space_state.intersect_ray(query)
+
+	if result.size() == 0:
+		# Free to move
+		target_position = next_pos
+		moving = true
+		update_walk_animation()
+	else:
+		# Blocked by wall
+		moving = false
+
+func move_towards_target(delta):
+	var distance = target_position - global_position
+	if distance.length() < 0.1:
+		global_position = target_position
+		moving = false
+		return
+
+	var step = distance.normalized() * move_speed * delta
+	if step.length() > distance.length():
+		step = distance
+	global_position += step
+
+func update_walk_animation():
+	if direction.x > 0:
+		right = true
+		left = false
+		up = false
+		down = false
+		anim.play("walk_right")
+	elif direction.x < 0:
+		left = true
+		right = false
+		up = false
+		down = false
+		anim.play("walk_left")
+	elif direction.y > 0:
+		down = true
+		up = false
+		left = false
+		right = false
+		anim.play("walk_down")
+	elif direction.y < 0:
+		up = true
+		down = false
+		left = false
+		right = false
+		anim.play("walk_up")
 
 
-	#if Input.is_action_just_released("attack") or autoAttack:
-		#if stamina_points >= 1:
-			#if !attacking and !attacking2:
-				##destination = global_position
-				#stamina_points -= 1
-				#$StaminaTimer.start()
-				#idling = false
-				#if enemies == null or enemies.size() == 0:
-					#attacking = true
-					#$Attack1Timer.start()
-					#if down:
-						#$AnimationPlayer.play("attack_down")
-					#if left:
-						#$AnimationPlayer.play("attack_left")
-					#if right:
-						#$AnimationPlayer.play("attack_right")
-					#if up:
-						#$AnimationPlayer.play("attack_up")
-				#else:
-					#attack(enemies[0])
-		#else:
-			#Hud.StaminaFlashRed()
-	#
-	#if Input.is_action_just_released("attack_2"):
-		#if stamina_points >= 2 and !attacking and !attacking2:
-			#stamina_points -= 2
-			##destination = global_position
-			#$StaminaTimer.start()
-			#idling = false
-			#if enemies == null or enemies.size() == 0:
-				#attacking2 = true
-				#$Attack2Timer.start()
-			#else:
-				#for en in enemies:
-					#attack_2(en)
-			#if down:
-				#$AnimationPlayer.play("attack_down_2")
-			#if left:
-				#$AnimationPlayer.play("attack_left_2")
-			#if right:
-				#$AnimationPlayer.play("attack_right_2")
-			#if up:
-				#$AnimationPlayer.play("attack_up_2")
-		#else:
-			#Hud.StaminaFlashRed()
-#
-	#if !stamina_ticking and idling and stamina_points < max_stamina_points:
-		#stamina_ticking = true
-		#$StaminaTickTimer.start()
+func update_idle_animation():
+	if down:
+		anim.play("idle_down")
+	elif up:
+		anim.play("idle_up")
+	elif left:
+		anim.play("idle_left")
+	elif right:
+		anim.play("idle_right")
 
-	if Input.is_action_just_released("attack"):
-			if !attacking and !attacking2:
-				idling = false
-				if enemies == null or enemies.size() == 0:
-					attacking = true
-					$AttackTimer.start()
-					if down:
-						$AnimationPlayer.play("attack_down")
-					if left:
-						$AnimationPlayer.play("attack_left")
-					if right:
-						$AnimationPlayer.play("attack_right")
-					if up:
-						$AnimationPlayer.play("attack_up")
-				else:
-					attack(enemies[0])
+
+func attack_action():
+	attacking = true
+	idling = false
+	if enemies.size() > 0:
+		attack(enemies[0])
+	else:
+		if down:
+			anim.play("attack_down")
+		elif up:
+			anim.play("attack_up")
+		elif left:
+			anim.play("attack_left")
+		elif right:
+			anim.play("attack_right")
+	$AttackTimer.start()
 
 func attack(body):
-	if !attacking and !dying:
+	if not attacking:
 		attacking = true
 		$AttackTimer.start()
-		$AttackMidSwingTimer.start()
-		var direction = body.global_position - global_position
-		if abs(direction.x) > abs(direction.y):
-			if direction.x > 0:
-				down = false
-				up = false
+		var diff = body.global_position - global_position
+		if abs(diff.x) > abs(diff.y):
+			if diff.x > 0:
 				right = true
 				left = false
-				$AnimationPlayer.play("attack_right")
-			else:
-				down = false
 				up = false
+				down = false
+				anim.play("attack_right")
+			else:
 				right = false
 				left = true
-				$AnimationPlayer.play("attack_left")
-		else:
-			if direction.y > 0:
-				down = true
 				up = false
-				right = false
-				left = false
-				$AnimationPlayer.play("attack_down")
-			else:
 				down = false
-				up = true
+				anim.play("attack_left")
+		else:
+			if diff.y > 0:
 				right = false
 				left = false
-				$AnimationPlayer.play("attack_up")
-
-
-
-
-
-
-
-func player_movement(_delta):
-	input = get_input()
-	velocity = input * move_speed
-	move_and_slide()
-
-func get_input():
-	input.x = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
-	input.y = int(Input.is_action_pressed("down")) - int(Input.is_action_pressed("up"))
-	inputting_movement = input != Vector2.ZERO
-	return input.normalized()
-
-
-func hurt(value):
-	if !attacking and !attacking2 and !hurting and !dying and !dead:
-		hurting = true
-		$HurtTimer.start()
-		$Camera2D.shake(0.6)  # smaller = more subtle, larger = stronger
-		if down:
-			$AnimationPlayer.play("hurt_down")
-		if left:
-			$AnimationPlayer.play("hurt_left")
-		if right:
-			$AnimationPlayer.play("hurt_right")
-		if up:
-			$AnimationPlayer.play("hurt_up")
-		GlobalData.hit_points -= value
-
-
-func die():
-	if !dying and !dead:
-		$AnimationPlayer.stop()
-		dying = true
-		$DeathTimer.start()
-		if down:
-			$AnimationPlayer.play("death_down")
-		if left:
-			$AnimationPlayer.play("death_left")
-		if right:
-			$AnimationPlayer.play("death_right")
-		if up:
-			$AnimationPlayer.play("death_up")
-
-
-func _on_hurt_timer_timeout():
-	$HurtTimer.stop()
-	hurting = false
-
-
-func _on_death_timer_timeout():
-	dead = true
-	$DeathTimer.stop()
-	GlobalData.hit_points = GlobalData.max_health
-	queue_free()
-	get_tree().change_scene_to_file("res://scenes/test.tscn")
-
+				up = false
+				down = true
+				anim.play("attack_down")
+			else:
+				right = false
+				left = false
+				up = true
+				down = false
+				anim.play("attack_up")
+		body.hurt(attack_power)
 
 func _on_attack_timer_timeout():
 	$AttackTimer.stop()
 	attacking = false
 	idling = true
 
-
-func _on_attack_mid_swing_timer_timeout():
-	if enemies != null and threatened:
-		enemies[0].hit_points = enemies[0].hurt(attack_power)
-	$AttackMidSwingTimer.stop()
-
+func die():
+	if not dead:
+		dead = true
+		$AnimationPlayer.stop()
+		$DeathTimer.start()
+		if down:
+			anim.play("death_down")
+		elif up:
+			anim.play("death_up")
+		elif left:
+			anim.play("death_left")
+		elif right:
+			anim.play("death_right")
+		GlobalData.hit_points = 0
 
 func _on_hit_box_body_entered(body):
 	if body is Enemy:
 		threatened = true
 		enemies.append(body)
-
 
 func _on_hit_box_body_exited(body):
 	if body is Enemy:
