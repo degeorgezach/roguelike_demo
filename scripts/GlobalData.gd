@@ -13,9 +13,14 @@ var enemy_turns_remaining: int = 0
 
 var occupied_tiles: Array = []
 
-func reset_occupied_tiles(player_pos: Vector2, enemy_nodes: Array) -> void:
-	occupied_tiles.clear()
-	occupied_tiles.append(player_pos)
-	for enemy in enemy_nodes:
-		if enemy:
-			occupied_tiles.append(enemy.global_position)
+# Suppose you have a TileMap called "Walls"
+func populate_occupied_tiles():
+	GlobalData.occupied_tiles.clear()
+
+	# Add all wall tiles
+	var walls = get_tree().get_nodes_in_group("Walls")
+	for wall in walls:
+		GlobalData.occupied_tiles.append(wall.global_position)
+
+	# Add player position
+	GlobalData.occupied_tiles.append(GlobalData.Player.global_position)

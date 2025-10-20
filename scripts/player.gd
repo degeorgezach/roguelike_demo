@@ -139,21 +139,30 @@ func handle_enemy_turns() -> void:
 		GlobalData.player_can_move = true
 		return
 
+	# Mark that enemies are taking turns
 	GlobalData.enemies_taking_turns = true
 	GlobalData.enemy_turns_remaining = enemy_nodes.size()
 
-	# Reset occupied tiles at start of turn
-	GlobalData.reset_occupied_tiles(global_position, enemy_nodes)
-
+	# Save the player's current position
 	var last_player_pos = global_position
+
+	# Populate occupied tiles with walls and enemies
+	GlobalData.populate_occupied_tiles()
 
 	for enemy in enemy_nodes:
 		if enemy and enemy.has_method("take_turn"):
+			# Pass both current player position and last player position
 			await enemy.take_turn(global_position, last_player_pos)
+			# Update last_player_pos so next enemy can follow accurately
 			last_player_pos = global_position
 
+	# All enemies done
 	GlobalData.enemies_taking_turns = false
 	GlobalData.player_can_move = true
+
+	# Update occupied tiles for next turn
+	GlobalData.populate_occupied_tiles()
+
 
 
 # -----------------------------

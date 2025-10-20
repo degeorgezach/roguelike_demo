@@ -3,7 +3,7 @@ class_name Enemy
 
 @export var tile_size: int = 16
 @export var move_speed: float = 128
-@export var detection_radius: float = 64.0
+@export var detection_radius: float = 48.0
 @export var wander_radius: float = 96.0
 @export var wander_chance: float = 0.5
 
@@ -15,6 +15,9 @@ var direction: Vector2 = Vector2.ZERO
 var home_position: Vector2 = Vector2.ZERO
 
 
+# --------------------------------------------------
+# Setup
+# --------------------------------------------------
 func _ready():
 	if home_position == Vector2.ZERO:
 		home_position = global_position
@@ -23,125 +26,98 @@ func _ready():
 	add_to_group("Enemies")
 
 
-# -----------------------------
+# Utility: Convert world pos to grid coordinate
+func grid_pos(pos: Vector2) -> Vector2:
+	return Vector2(round(pos.x / tile_size), round(pos.y / tile_size))
+
+
+# --------------------------------------------------
 # Enemy Turn
-# -----------------------------
+# --------------------------------------------------
 func take_turn(player_pos: Vector2, last_player_pos: Vector2) -> void:
-	var diff = player_pos - global_position
-	var move_vector = Vector2.ZERO
+	# Rebuild occupied tiles (walls + other enemies)
+	GlobalData.occupied_tiles.clear()
 
-	if abs(diff.x) > abs(diff.y):
-		move_vector.x = tile_size * sign(diff.x)
+	for wall in get_tree().get_nodes_in_group("WallTiles"):
+		GlobalData.occupied_tiles.append(grid_pos(wall.global_position))
+
+	for enemy in get_tree().get_nodes_in_group("Enemies"):
+		if enemy != self:
+			GlobalData.occupied_tiles.append(grid_pos(enemy.global_position))
+
+	# Decide move
+	var move_dir: Vector2 = Vector2.ZERO
+	var distance_to_player = global_position.distance_to(player_pos)
+
+	if distance_to_player <= detection_radius:
+		# --- Chase player ---
+		var diff = player_pos - global_position
+		if abs(diff.x) > abs(diff.y):
+			move_dir = Vector2(sign(diff.x), 0)
+		else:
+			move_dir = Vector2(0, sign(diff.y))
 	else:
-		move_vector.y = tile_size * sign(diff.y)
+		# --- Wander randomly ---
+		if randf() < wander_chance:
+			var dirs = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
+			move_dir = dirs[randi() % dirs.size()]
 
+	# Attempt to move (allow stepping on player)
+	if try_move_tile(move_dir, player_pos):
+		GlobalData.occupied_tiles.append(grid_pos(target_position))
 
-	var proposed_pos = global_position + move_vector
+	# Smooth movement to new tile
+	await move_towards_target()
 
-	# Check if tile is occupied
-	if proposed_pos in GlobalData.occupied_tiles:
-		proposed_pos = global_position  # stay in place
-
-	target_position = proposed_pos
-
-	# Mark new position as occupied
-	GlobalData.occupied_tiles.append(target_position)
-
-	# Smooth movement
-	moving = true
-	while (global_position - target_position).length() > 0.01:
-		var distance = target_position - global_position
-		var step = distance.normalized() * move_speed * get_physics_process_delta_time()
-		if step.length() > distance.length():
-			step = distance
-		global_position += step
-		await get_tree().process_frame
-	global_position = target_position
-	moving = false
-
-	# Notify global system
+	# End turn
 	GlobalData.enemy_turns_remaining -= 1
+	if GlobalData.enemy_turns_remaining <= 0:
+		GlobalData.enemies_taking_turns = false
 
 
-
-# -----------------------------
-# CHASE + WANDER BEHAVIOR
-# -----------------------------
-func move_toward_player(player_pos: Vector2, last_player_pos: Vector2):
-	var delta = player_pos - global_position
-	var move_vector = Vector2.ZERO
-
-	if abs(delta.x) > abs(delta.y):
-		move_vector.x = sign(delta.x)
-	else:
-		move_vector.y = sign(delta.y)
-
-	try_move_tile(move_vector, player_pos, last_player_pos)
-
-func random_wander():
-	if randf() < wander_chance:
-		var dirs = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
-		var dir = dirs[randi() % dirs.size()]
-		var next_pos = global_position + dir * tile_size
-		if next_pos.distance_to(home_position) <= wander_radius:
-			try_move_tile(dir)
-
-
-# -----------------------------
-# MOVEMENT + COLLISION
-# -----------------------------
-func try_move_tile(dir: Vector2, player_pos: Vector2 = Vector2.INF, last_player_pos: Vector2 = Vector2.INF):
+# --------------------------------------------------
+# Try to move in given direction
+# --------------------------------------------------
+func try_move_tile(dir: Vector2, player_pos: Vector2 = Vector2.INF) -> bool:
 	if dir == Vector2.ZERO:
-		end_turn()
-		return
+		return false
 
 	var next_pos = global_position + dir * tile_size
+	var next_grid = grid_pos(next_pos)
+	var player_grid = grid_pos(player_pos)
 
-	if player_pos != Vector2.INF and next_pos == player_pos:
-		moving = false
-		end_turn()
-		return
-	elif last_player_pos != Vector2.INF and next_pos == last_player_pos:
-		target_position = next_pos
-		direction = dir
-		update_walk_animation(dir)
-		moving = true
-		await move_towards_target()
-		return
+	# --- Don't move into player tile ---
+	if next_grid == player_grid:
+		# Optional: trigger an attack or stop
+		return false
 
-	if not test_move(global_transform, dir * tile_size):
-		target_position = next_pos
-		direction = dir
-		update_walk_animation(dir)
-		moving = true
-		await move_towards_target()
-	else:
-		moving = false
-		end_turn()
+	# --- Check for wall collisions ---
+	if test_move(global_transform, dir * tile_size * 0.5):
+		return false
 
+	# --- Check for enemy collisions ---
+	for enemy in get_tree().get_nodes_in_group("Enemies"):
+		if enemy != self and enemy.global_position.distance_to(next_pos) < tile_size * 0.5:
+			return false
 
-func _physics_process(delta):
-	if moving:
-		move_towards_target_step(delta)
-	else:
-		update_idle_animation()
+	# --- Move is valid ---
+	target_position = next_pos
+	direction = dir
+	return true
 
 
-func move_towards_target_step(delta):
-	var distance = target_position - global_position
-	if distance.length() < 0.01:
-		global_position = target_position
-		moving = false
+
+
+# --------------------------------------------------
+# Smooth movement
+# --------------------------------------------------
+func move_towards_target() -> void:
+	if target_position == global_position:
 		return
 
-	var step = distance.normalized() * move_speed * delta
-	if step.length() > distance.length():
-		step = distance
-	global_position += step
+	moving = true
+	update_walk_animation(direction)
 
-
-# Async move for turn-taking
-func move_towards_target():
 	while (global_position - target_position).length() > 0.01:
 		var distance = target_position - global_position
 		var step = distance.normalized() * move_speed * get_physics_process_delta_time()
@@ -149,14 +125,32 @@ func move_towards_target():
 			step = distance
 		global_position += step
 		await get_tree().process_frame
+
 	global_position = target_position
 	moving = false
-	end_turn()
+	update_idle_animation()
 
 
-# -----------------------------
-# ANIMATIONS
-# -----------------------------
+# --------------------------------------------------
+# Physics (optional)
+# --------------------------------------------------
+func _physics_process(delta):
+	if moving:
+		var distance = target_position - global_position
+		if distance.length() > 0.01:
+			var step = distance.normalized() * move_speed * delta
+			if step.length() > distance.length():
+				step = distance
+			global_position += step
+		else:
+			global_position = target_position
+			moving = false
+			update_idle_animation()
+
+
+# --------------------------------------------------
+# Animations
+# --------------------------------------------------
 func update_walk_animation(dir: Vector2):
 	if dir.x > 0:
 		anim.play("walk_right")
@@ -167,6 +161,7 @@ func update_walk_animation(dir: Vector2):
 	elif dir.y < 0:
 		anim.play("walk_up")
 
+
 func update_idle_animation():
 	if direction.x > 0:
 		anim.play("idle_right")
@@ -176,13 +171,3 @@ func update_idle_animation():
 		anim.play("idle_down")
 	elif direction.y < 0:
 		anim.play("idle_up")
-
-
-# -----------------------------
-# END TURN
-# -----------------------------
-func end_turn():
-	GlobalData.enemy_turns_remaining -= 1
-	if GlobalData.enemy_turns_remaining <= 0:
-		GlobalData.enemies_taking_turns = false
- 
