@@ -178,6 +178,15 @@ func update_animation():
 			anim.play("walk_down")
 		elif direction.y < 0:
 			anim.play("walk_up")
+	elif attacking:
+		if direction.x > 0:
+			anim.play("attack_right")
+		elif direction.x < 0:
+			anim.play("attack_left")
+		elif direction.y > 0:
+			anim.play("attack_down")
+		elif direction.y < 0:
+			anim.play("attack_up")
 	else:
 		if direction.x > 0:
 			anim.play("idle_right")
@@ -193,7 +202,6 @@ func update_animation():
 # Attack
 # -----------------------------
 func attack_action():
-	attacking = true
 	idling = false
 	if enemies.size() > 0:
 		attack(enemies[0])

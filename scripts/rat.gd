@@ -4,8 +4,8 @@ extends Enemy
 func _ready():
 	super._ready()
 	#original_position = global_position
-	#hit_points = 2
-	#max_hit_points = hit_points
+	hit_points = 2
+	max_hit_points = hit_points
 	#xp = 40
 	move_speed = 32
 	#detection_radius  = 64

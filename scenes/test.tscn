@@ -117,3 +117,9 @@ polygon = PackedVector2Array(-184, 8, -184, 104, -8, 104, -8, 184, 312, 184, 312
 
 [node name="Rat" parent="." groups=["Enemies"] instance=ExtResource("5_j5jx5")]
 position = Vector2(360, 40)
+
+[node name="Rat2" parent="." groups=["Enemies"] instance=ExtResource("5_j5jx5")]
+position = Vector2(312, 200)
+
+[node name="Rat3" parent="." groups=["Enemies"] instance=ExtResource("5_j5jx5")]
+position = Vector2(440, 168)

@@ -14,6 +14,23 @@ var moving: bool = false
 var direction: Vector2 = Vector2.ZERO
 var home_position: Vector2 = Vector2.ZERO
 
+var threatened = false
+var attacking = false
+var hurting = false
+var dying = false
+var dead = false
+var pendingDamage = 0
+var hit_points = 0
+var max_hit_points = 0
+
+var up = false
+var down = false
+var left = false
+var right = false
+
+var is_chasing = false
+var is_returning = false
+
 
 # --------------------------------------------------
 # Setup
@@ -148,26 +165,188 @@ func _physics_process(delta):
 			update_idle_animation()
 
 
+
+func hurt(value: int) -> void:
+	if dying or dead or hurting:
+		return
+
+	pendingDamage = value
+	var newHP = hit_points - pendingDamage
+	hit_points = newHP
+
+	if newHP <= 0:
+		die()
+		return
+
+	hurting = true
+	attacking = false
+	dying = false
+
+	# Pick hurt animation direction
+	var anim_name = ""
+	if down:
+		anim_name = "hurt_down"
+	elif up:
+		anim_name = "hurt_up"
+	elif left:
+		anim_name = "hurt_left"
+	elif right:
+		anim_name = "hurt_right"
+	else:
+		anim_name = "hurt_down"
+
+	play_animation(anim_name)
+	$HurtTimer.start()
+
+
+
+func die() -> void:
+	if dying or dead:
+		return
+
+	dying = true
+	hurting = false
+	attacking = false
+	moving = false
+	threatened = false
+	is_chasing = false
+	is_returning = false
+
+	$CollisionShape2D.disabled = true
+	$HurtTimer.stop()
+	$AttackTimer.stop()
+	$MidSwingTimer.stop()
+
+	# Choose correct death animation
+	var anim_name = ""
+	if down:
+		anim_name = "death_down"
+	elif up:
+		anim_name = "death_up"
+	elif left:
+		anim_name = "death_left"
+	elif right:
+		anim_name = "death_right"
+	else:
+		anim_name = "death_down"
+
+	play_animation(anim_name)
+	$DeathTimer.start()
+
+
+
+
+
 # --------------------------------------------------
 # Animations
 # --------------------------------------------------
 func update_walk_animation(dir: Vector2):
 	if dir.x > 0:
+		right = true
+		left = false
+		up = false
+		down = false
 		anim.play("walk_right")
 	elif dir.x < 0:
+		right = false
+		left = true
+		up = false
+		down = false
 		anim.play("walk_left")
 	elif dir.y > 0:
+		right = false
+		left = false
+		up = false
+		down = true
 		anim.play("walk_down")
 	elif dir.y < 0:
+		right = false
+		left = false
+		up = true
+		down = false
 		anim.play("walk_up")
 
 
 func update_idle_animation():
 	if direction.x > 0:
+		right = true
+		left = false
+		up = false
+		down = false
 		anim.play("idle_right")
 	elif direction.x < 0:
+		right = false
+		left = true
+		up = false
+		down = false
 		anim.play("idle_left")
 	elif direction.y > 0:
+		right = false
+		left = false
+		up = false
+		down = true
 		anim.play("idle_down")
 	elif direction.y < 0:
+		right = false
+		left = false
+		up = true
+		down = false
 		anim.play("idle_up")
+
+
+var current_animation = ""
+
+func play_animation(name):
+	if current_animation != name:
+		$AnimationPlayer.play(name)
+		current_animation = name
+
+
+func deactivate_enemy():
+	queue_free()
+	#hide()
+	#set_process(false)
+	#set_physics_process(false)
+	#$HitBox.monitoring = false
+	#$HitBox.set_deferred("monitorable", false)
+	#$HitBox/CollisionShape2D.disabled = true
+	#$CollisionShape2D.disabled = true
+	#$HitBox/CollisionShape2D.set_deferred("disabled", true)
+
+
+# --------------------------------------------------
+# Timers
+# --------------------------------------------------
+
+func _on_attack_timer_timeout() -> void:
+	pass # Replace with function body.
+	
+	
+	
+func _on_hurt_timer_timeout() -> void:
+	$HurtTimer.stop()
+	hurting = false
+	update_idle_animation()
+
+
+func _on_death_timer_timeout():
+	$DeathTimer.stop()
+	dead = true
+	dying = false
+
+	# Begin respawn timer and cleanup
+	#$RespawnTimer.wait_time = respawn_time
+	#$RespawnTimer.start()
+	deactivate_enemy()
+
+
+func _on_dying_timer_timeout():
+	$DyingTimer.stop()
+	if down:
+		$AnimationPlayer.play("death_down")
+	if left:
+		$AnimationPlayer.play("death_left")
+	if right:
+		$AnimationPlayer.play("death_right")
+	if up:
+		$AnimationPlayer.play("death_up")
