@@ -7,6 +7,16 @@ class_name Player
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 
+var hurting = false
+var dying = false
+var pendingDamage = 0
+var hit_points
+
+var down = false
+var up = false
+var right = false
+var left = false
+
 var moving: bool = false
 var target_position: Vector2
 var direction: Vector2 = Vector2.ZERO
@@ -187,6 +197,15 @@ func update_animation():
 			anim.play("attack_down")
 		elif direction.y < 0:
 			anim.play("attack_up")
+	elif hurting:
+		if direction.x > 0:
+			anim.play("hurt_right")
+		elif direction.x < 0:
+			anim.play("hurt_left")
+		elif direction.y > 0:
+			anim.play("hurt_down")
+		elif direction.y < 0:
+			anim.play("hurt_up")
 	else:
 		if direction.x > 0:
 			anim.play("idle_right")
@@ -268,6 +287,33 @@ func die():
 		GlobalData.hit_points = 0
 
 
+func hurt(value):
+	if dying or dead or hurting:
+		return
+
+	pendingDamage = value
+	if GlobalData.hit_points == null:
+		GlobalData.hit_points = 0
+	var newHP = GlobalData.hit_points - pendingDamage
+
+	if newHP <= 0:
+		$AnimationPlayer.stop()
+		die()
+	else:
+		hurting = true
+		attacking = false		
+		moving = false
+		$HurtTimer.start()
+
+		update_animation()
+
+	GlobalData.hit_points = newHP
+
+
+
+
+
+
 # -----------------------------
 # Enemy Detection
 # -----------------------------
@@ -283,3 +329,9 @@ func _on_hit_box_body_exited(body):
 			enemies.erase(body)
 		if enemies.size() == 0:
 			threatened = false
+
+
+func _on_hurt_timer_timeout() -> void:
+	$HurtTimer.stop()
+	hurting = false
+	update_animation()

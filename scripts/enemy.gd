@@ -16,6 +16,8 @@ var home_position: Vector2 = Vector2.ZERO
 
 var threatened = false
 var attacking = false
+var queued_attack = false
+
 var hurting = false
 var dying = false
 var dead = false
@@ -183,34 +185,37 @@ func _physics_process(delta):
 
 
 func hurt(value):
-	if dying or dead or hurting:
+	if dying or dead:
 		return
 
+	if hurting:
+		return  # Already taking damage — ignore reentry
+
 	pendingDamage = value
-	if hit_points == null:
-		hit_points = 0
 	var newHP = hit_points - pendingDamage
 
 	if newHP <= 0:
 		$AnimationPlayer.stop()
 		die()
-	else:
-		hurting = true
-		attacking = false		
-		moving = false
-		$HurtTimer.start()
+		return
 
-		# Play appropriate hurt animation (only one)
-		if down:
-			play_animation("hurt_down")
-		elif left:
-			play_animation("hurt_left")
-		elif right:
-			play_animation("hurt_right")
-		elif up:
-			play_animation("hurt_up")
+	hurting = true
+	attacking = false
+	moving = false
+	queued_attack = true  # mark that we should attack after hurt finishes
+	$HurtTimer.start()
+
+	if down:
+		play_animation("hurt_down")
+	elif left:
+		play_animation("hurt_left")
+	elif right:
+		play_animation("hurt_right")
+	elif up:
+		play_animation("hurt_up")
 
 	hit_points = newHP
+
 
 
 
@@ -462,7 +467,7 @@ func _on_attack_timer_timeout():
 
 
 func _on_mid_swing_timer_timeout():
-	if GlobalData.Player != null and threatened and !hurting and !dying and attacking:
+	if GlobalData.Player != null and !hurting and !dying and attacking:
 		if move_speed == 0:
 			if is_player_hit():
 				GlobalData.Player.hurt(attack_power)
@@ -475,6 +480,11 @@ func _on_hurt_timer_timeout() -> void:
 	$HurtTimer.stop()
 	hurting = false
 	update_idle_animation()
+
+	if queued_attack and !dying and !dead:
+		queued_attack = false
+		await attack_action()
+
 
 
 func _on_death_timer_timeout():
