@@ -239,6 +239,7 @@ func attack(body):
 				anim.play("attack_up")
 
 		body.hurt(attack_power)
+		await handle_enemy_turns()
 
 
 func _on_attack_timer_timeout():

@@ -23,6 +23,8 @@ var pendingDamage = 0
 var hit_points = 0
 var max_hit_points = 0
 
+var attack_power = 1
+
 var up = false
 var down = false
 var left = false
@@ -62,34 +64,46 @@ func take_turn(player_pos: Vector2, last_player_pos: Vector2) -> void:
 		if enemy != self:
 			GlobalData.occupied_tiles.append(grid_pos(enemy.global_position))
 
-	# Decide move
-	var move_dir: Vector2 = Vector2.ZERO
+	# --- Determine relationship to player ---
 	var distance_to_player = global_position.distance_to(player_pos)
+	var diff = player_pos - global_position
+	var move_dir: Vector2 = Vector2.ZERO
 
-	if distance_to_player <= detection_radius:
-		# --- Chase player ---
-		var diff = player_pos - global_position
+	# --- If player is within striking distance, ATTACK ---
+	if distance_to_player <= tile_size * 1.1:
+		# Face toward player
 		if abs(diff.x) > abs(diff.y):
-			move_dir = Vector2(sign(diff.x), 0)
+			direction = Vector2(sign(diff.x), 0)
 		else:
-			move_dir = Vector2(0, sign(diff.y))
+			direction = Vector2(0, sign(diff.y))
+		if !hurting and !dying:
+			update_idle_animation()
+
+		# Attack
+		await attack_action()
 	else:
-		# --- Wander randomly ---
-		if randf() < wander_chance:
-			var dirs = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
-			move_dir = dirs[randi() % dirs.size()]
+		# --- If player is close enough to chase ---
+		if distance_to_player <= detection_radius:
+			if abs(diff.x) > abs(diff.y):
+				move_dir = Vector2(sign(diff.x), 0)
+			else:
+				move_dir = Vector2(0, sign(diff.y))
+		else:
+			# --- Wander randomly ---
+			if randf() < wander_chance:
+				var dirs = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
+				move_dir = dirs[randi() % dirs.size()]
 
-	# Attempt to move (allow stepping on player)
-	if try_move_tile(move_dir, player_pos):
-		GlobalData.occupied_tiles.append(grid_pos(target_position))
-
-	# Smooth movement to new tile
-	await move_towards_target()
+		# Attempt to move (allow stepping on player)
+		if try_move_tile(move_dir, player_pos):
+			GlobalData.occupied_tiles.append(grid_pos(target_position))
+			await move_towards_target()
 
 	# End turn
 	GlobalData.enemy_turns_remaining -= 1
 	if GlobalData.enemy_turns_remaining <= 0:
 		GlobalData.enemies_taking_turns = false
+
 
 
 # --------------------------------------------------
@@ -145,7 +159,8 @@ func move_towards_target() -> void:
 
 	global_position = target_position
 	moving = false
-	update_idle_animation()
+	if !hurting and !dying:
+		update_idle_animation()
 
 
 # --------------------------------------------------
@@ -162,41 +177,42 @@ func _physics_process(delta):
 		else:
 			global_position = target_position
 			moving = false
-			update_idle_animation()
+			if !hurting and !dying:
+				update_idle_animation()
 
 
 
-func hurt(value: int) -> void:
+func hurt(value):
 	if dying or dead or hurting:
 		return
 
 	pendingDamage = value
+	if hit_points == null:
+		hit_points = 0
 	var newHP = hit_points - pendingDamage
-	hit_points = newHP
 
 	if newHP <= 0:
+		$AnimationPlayer.stop()
 		die()
-		return
-
-	hurting = true
-	attacking = false
-	dying = false
-
-	# Pick hurt animation direction
-	var anim_name = ""
-	if down:
-		anim_name = "hurt_down"
-	elif up:
-		anim_name = "hurt_up"
-	elif left:
-		anim_name = "hurt_left"
-	elif right:
-		anim_name = "hurt_right"
 	else:
-		anim_name = "hurt_down"
+		hurting = true
+		attacking = false		
+		moving = false
+		$HurtTimer.start()
 
-	play_animation(anim_name)
-	$HurtTimer.start()
+		# Play appropriate hurt animation (only one)
+		if down:
+			play_animation("hurt_down")
+		elif left:
+			play_animation("hurt_left")
+		elif right:
+			play_animation("hurt_right")
+		elif up:
+			play_animation("hurt_up")
+
+	hit_points = newHP
+
+
 
 
 
@@ -204,6 +220,7 @@ func die() -> void:
 	if dying or dead:
 		return
 
+	print("Enemy died")
 	dying = true
 	hurting = false
 	attacking = false
@@ -217,12 +234,11 @@ func die() -> void:
 	$AttackTimer.stop()
 	$MidSwingTimer.stop()
 
-	# Choose correct death animation
 	var anim_name = ""
-	if down:
-		anim_name = "death_down"
-	elif up:
+	if up:
 		anim_name = "death_up"
+	elif down:
+		anim_name = "death_down"
 	elif left:
 		anim_name = "death_left"
 	elif right:
@@ -230,8 +246,12 @@ func die() -> void:
 	else:
 		anim_name = "death_down"
 
-	play_animation(anim_name)
+	print("Playing animation:", anim_name)
+	anim.play(anim_name)
+
 	$DeathTimer.start()
+
+
 
 
 
@@ -314,15 +334,143 @@ func deactivate_enemy():
 	#$HitBox/CollisionShape2D.set_deferred("disabled", true)
 
 
+func is_player_hit() -> bool:
+	var player_position = GlobalData.Player.global_position
+	var enemy_position = global_position
+	var arrow_direction
+	# Calculate the difference between player and enemy positions
+	var difference = player_position - enemy_position
+
+	if up:
+		arrow_direction = Vector2(0, -1)
+	elif down:
+		arrow_direction = Vector2(0, 1)
+	elif left:
+		arrow_direction = Vector2(-1, 0)
+	elif right:
+		arrow_direction = Vector2(1, 0)
+
+	if arrow_direction == Vector2(1, 0) or arrow_direction == Vector2(-1, 0):  # Left/Right
+		if (sign(difference.x) == sign(arrow_direction.x) or difference.x == 0):
+			return true
+
+	elif arrow_direction == Vector2(0, 1) or arrow_direction == Vector2(0, -1):  # Up/Down
+		if (sign(difference.y) == sign(arrow_direction.y) or difference.y == 0):
+			return true
+
+	return false
+
+
+
+func update_animation_from_velocity():
+	if attacking and $AnimationPlayer.is_playing() and current_animation.begins_with("attack"):
+		return
+
+	# Determine dominant direction from velocity
+	if velocity.length() == 0:
+		# Enemy is idle, pick last known direction
+		if down:
+			play_animation("idle_down")
+		elif up:
+			play_animation("idle_up")
+		elif left:
+			play_animation("idle_left")
+		elif right:
+			play_animation("idle_right")
+		return
+
+	if abs(velocity.y) > abs(velocity.x):
+		if velocity.y > 0:
+			down = true
+			up = false
+			right = false
+			left = false
+			play_animation("walk_down")
+		else:
+			up = true
+			down = false
+			left = false
+			right = false
+			play_animation("walk_up")
+	else:
+		if velocity.x > 0:
+			right = true
+			up = false
+			down = false
+			left = false
+			play_animation("walk_right")
+		else:
+			left = true
+			up = false
+			down = false
+			right = false
+			play_animation("walk_left")
+
+
+func attack_action() -> void:
+	if attacking or hurting or dying or dead:
+		return
+
+	attacking = true
+	hurting = false
+	dying = false
+
+	# Pick correct attack animation
+	var anim_name = ""
+	if down:
+		anim_name = "attack_down"
+	elif up:
+		anim_name = "attack_up"
+	elif left:
+		anim_name = "attack_left"
+	elif right:
+		anim_name = "attack_right"
+	else:
+		anim_name = "attack_down"
+
+	play_animation(anim_name)
+
+	# Start timers
+	$MidSwingTimer.start()   # This will trigger damage mid-swing
+	$AttackTimer.start()     # This resets after attack finishes
+	await get_tree().create_timer($AttackTimer.wait_time).timeout
+
+
+
+
 # --------------------------------------------------
 # Timers
 # --------------------------------------------------
 
-func _on_attack_timer_timeout() -> void:
-	pass # Replace with function body.
-	
-	
-	
+func _on_attack_timer_timeout():
+	$AttackTimer.stop()
+	attacking = false
+	# Do NOT clear facing flags here — we want to preserve last known facing so death/hurt animations can use it.
+	# If currently chasing, switch to walk animation now
+	if is_chasing:
+		update_animation_from_velocity()
+	else:
+		# otherwise go to idle matching facing (preserves facing flags)
+		if down:
+			play_animation("idle_down")
+		elif up:
+			play_animation("idle_up")
+		elif left:
+			play_animation("idle_left")
+		elif right:
+			play_animation("idle_right")
+
+
+func _on_mid_swing_timer_timeout():
+	if GlobalData.Player != null and threatened and !hurting and !dying and attacking:
+		if move_speed == 0:
+			if is_player_hit():
+				GlobalData.Player.hurt(attack_power)
+		else:
+			GlobalData.Player.hurt(attack_power)
+	$MidSwingTimer.stop()
+
+
 func _on_hurt_timer_timeout() -> void:
 	$HurtTimer.stop()
 	hurting = false
