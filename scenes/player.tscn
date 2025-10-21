@@ -1260,7 +1260,7 @@ position = Vector2(-133, -146)
 shape = SubResource("CircleShape2D_d2wvv")
 
 [node name="HurtTimer" type="Timer" parent="."]
-wait_time = 0.3
+wait_time = 0.21
 
 [node name="DeathTimer" type="Timer" parent="."]
 wait_time = 2.0

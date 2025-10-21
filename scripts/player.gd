@@ -87,6 +87,8 @@ func handle_input():
 	
 	if Input.is_action_just_pressed("attack") and not attacking:
 		attack_action()
+	elif Input.is_action_just_pressed("pass") and not attacking:
+		handle_enemy_turns()
 
 
 # -----------------------------
@@ -206,6 +208,15 @@ func update_animation():
 			anim.play("hurt_down")
 		elif direction.y < 0:
 			anim.play("hurt_up")
+	elif dying:
+		if direction.x > 0:
+			anim.play("death_right")
+		elif direction.x < 0:
+			anim.play("death_left")
+		elif direction.y > 0:
+			anim.play("death_down")
+		elif direction.y < 0:
+			anim.play("death_up")
 	else:
 		if direction.x > 0:
 			anim.play("idle_right")
@@ -270,21 +281,44 @@ func _on_attack_timer_timeout():
 # -----------------------------
 # Death
 # -----------------------------
-func die():
-	if not dead:
-		dead = true
-		$AnimationPlayer.stop()
-		$DeathTimer.start()
-		match direction:
-			Vector2.DOWN:
-				anim.play("death_down")
-			Vector2.UP:
-				anim.play("death_up")
-			Vector2.LEFT:
-				anim.play("death_left")
-			Vector2.RIGHT:
-				anim.play("death_right")
-		GlobalData.hit_points = 0
+func die() -> void:
+	if dying or dead:
+		return
+
+	print("Player died")
+	dying = true
+	hurting = false
+	attacking = false
+	moving = false
+	GlobalData.player_can_move = false
+
+	# Pick death animation based on direction
+	var anim_name := ""
+	match direction:
+		Vector2.UP: anim_name = "death_up"
+		Vector2.DOWN: anim_name = "death_down"
+		Vector2.LEFT: anim_name = "death_left"
+		Vector2.RIGHT: anim_name = "death_right"
+		_: anim_name = "death_down"
+
+	anim.play(anim_name)
+
+	# Wait for animation to finish before fully dying
+	await anim.animation_finished
+
+	dead = true
+	dying = false
+
+	print("Death animation finished")
+	
+	GlobalData.hit_points = GlobalData.max_health
+	queue_free()
+	get_tree().change_scene_to_file("res://scenes/test.tscn")
+
+	# You can add fade-out or respawn logic here:
+	# get_tree().change_scene_to_file("res://scenes/GameOver.tscn")
+	# or queue_free()
+
 
 
 func hurt(value):
@@ -335,3 +369,11 @@ func _on_hurt_timer_timeout() -> void:
 	$HurtTimer.stop()
 	hurting = false
 	update_animation()
+
+
+func _on_death_timer_timeout() -> void:
+	dead = true
+	$DeathTimer.stop()
+	GlobalData.hit_points = GlobalData.max_health
+	queue_free()
+	get_tree().change_scene_to_file("res://scenes/test.tscn")
