@@ -47,16 +47,82 @@ func _ready():
 	add_to_group("Enemies")
 
 
-# Utility: Convert world pos to grid coordinate
-func grid_pos(pos: Vector2) -> Vector2:
-	return Vector2(round(pos.x / tile_size), round(pos.y / tile_size))
+# --- Helpers ---
+
+# Return integer grid Vector2 (same basis as your grid_pos)
+func _grid_vec(v: Vector2) -> Vector2:
+	return Vector2(int(v.x), int(v.y))
+
+# Check if a grid cell is occupied according to GlobalData.occupied_tiles.
+# We allow 'start' to be considered free (so BFS can start from the enemy's current cell).
+func _is_occupied(grid: Vector2, start: Vector2) -> bool:
+	var g = _grid_vec(grid)
+	var s = _grid_vec(start)
+	if g == s:
+		return false
+	for o in GlobalData.occupied_tiles:
+		if _grid_vec(o) == g:
+			return true
+	return false
+
+# BFS to find a path from start_grid to any free neighbor of target_grid.
+# Returns an Array of grid positions (Vector2) from start to goal (inclusive).
+# If no path found returns empty Array.
+func _find_path_to_adjacent(start_grid: Vector2, target_grid: Vector2) -> Array:
+	var start = _grid_vec(start_grid)
+	var target = _grid_vec(target_grid)
+	var dirs = [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)]
+
+	# Collect goal neighbor cells (cardinal neighbors of the player) that are not occupied.
+	var goal_neighbors = []
+	for d in dirs:
+		var n = target + d
+		if not _is_occupied(n, start):
+			goal_neighbors.append(n)
+	if goal_neighbors.size() == 0:
+		return []
+
+	# BFS structures
+	var q = []
+	var came_from = {} # key: "x,y" -> Vector2 parent
+	var start_key = "%d,%d" % [int(start.x), int(start.y)]
+	q.append(start)
+	came_from[start_key] = null
+
+	while q.size() > 0:
+		var cur = q.pop_front()
+		# If this cell matches any goal neighbor, reconstruct the path
+		for gn in goal_neighbors:
+			if _grid_vec(cur) == _grid_vec(gn):
+				# reconstruct path from start -> cur
+				var path = []
+				var node = cur
+				while node != null:
+					path.insert(0, node)
+					var node_key = "%d,%d" % [int(node.x), int(node.y)]
+					node = came_from.get(node_key, null)
+				return path
+		# expand neighbors
+		for d in dirs:
+			var n = _grid_vec(cur) + d
+			var n_key = "%d,%d" % [int(n.x), int(n.y)]
+			if came_from.has(n_key):
+				continue
+			# skip occupied (respecting start)
+			if _is_occupied(n, start):
+				continue
+			came_from[n_key] = cur
+			q.append(n)
+
+	# no path
+	return []
 
 
-# --------------------------------------------------
-# Enemy Turn
-# --------------------------------------------------
+# Utility: Convert world pos to grid coordinate 
+func grid_pos(pos: Vector2) -> Vector2: return Vector2(round(pos.x / tile_size), round(pos.y / tile_size))
+
 func take_turn(player_pos: Vector2, last_player_pos: Vector2) -> void:
-	# Rebuild occupied tiles (walls + other enemies)
+	# rebuild occupied tiles (walls + other enemies)
 	GlobalData.occupied_tiles.clear()
 
 	for wall in get_tree().get_nodes_in_group("WallTiles"):
@@ -66,45 +132,91 @@ func take_turn(player_pos: Vector2, last_player_pos: Vector2) -> void:
 		if enemy != self:
 			GlobalData.occupied_tiles.append(grid_pos(enemy.global_position))
 
-	# --- Determine relationship to player ---
 	var distance_to_player = global_position.distance_to(player_pos)
 	var diff = player_pos - global_position
 	var move_dir: Vector2 = Vector2.ZERO
 
-	# --- If player is within striking distance, ATTACK ---
+	# --- If close enough to attack ---
 	if distance_to_player <= tile_size * 1.1:
-		# Face toward player
 		if abs(diff.x) > abs(diff.y):
 			direction = Vector2(sign(diff.x), 0)
 		else:
 			direction = Vector2(0, sign(diff.y))
 		if !hurting and !dying:
 			update_idle_animation()
-
-		# Attack
 		await attack_action()
+
 	else:
-		# --- If player is close enough to chase ---
+		# --- Chase player if detected ---
 		if distance_to_player <= detection_radius:
-			if abs(diff.x) > abs(diff.y):
-				move_dir = Vector2(sign(diff.x), 0)
+			var dx = int(sign(diff.x))
+			var dy = int(sign(diff.y))
+
+			# Are we already cardinally adjacent? Use grid coords (safer)
+			var enemy_grid = grid_pos(global_position)
+			var player_grid = grid_pos(player_pos)
+			var horizontal_adjacent = (abs(player_grid.x - enemy_grid.x) == 1 and player_grid.y == enemy_grid.y)
+			var vertical_adjacent = (abs(player_grid.y - enemy_grid.y) == 1 and player_grid.x == enemy_grid.x)
+			if horizontal_adjacent or vertical_adjacent:
+				move_dir = Vector2.ZERO
 			else:
-				move_dir = Vector2(0, sign(diff.y))
+				# Choose primary and secondary directions
+				var primary: Vector2
+				var secondary: Vector2
+				if abs(diff.x) >= abs(diff.y):
+					primary = Vector2(dx, 0)
+					secondary = Vector2(0, dy)
+				else:
+					primary = Vector2(0, dy)
+					secondary = Vector2(dx, 0)
+
+				# Try primary axis first (try_move_tile sets target_position if valid)
+				if try_move_tile(primary, player_pos):
+					move_dir = primary
+				elif try_move_tile(secondary, player_pos):
+					move_dir = secondary
+				else:
+					# Both immediate cardinal moves blocked — attempt BFS to any free adjacent tile
+					var path = _find_path_to_adjacent(enemy_grid, player_grid)
+					if path.size() >= 2:
+						# path[0] == enemy_grid, path[1] is next step (grid)
+						var next_step = path[1]
+						var step_delta = _grid_vec(next_step) - _grid_vec(enemy_grid)
+						var step_dir = Vector2(int(step_delta.x), int(step_delta.y))
+						# Attempt that step (BFS ensured it's not in GlobalData.occupied_tiles,
+						# but try_move_tile still checks collisions/test_move)
+						if try_move_tile(step_dir, player_pos):
+							move_dir = step_dir
+						else:
+							move_dir = Vector2.ZERO
+					else:
+						move_dir = Vector2.ZERO
+
 		else:
-			# --- Wander randomly ---
+			# --- Wander randomly --- 
+			# (CALL try_move_tile here — previously you only set move_dir)
 			if randf() < wander_chance:
 				var dirs = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
-				move_dir = dirs[randi() % dirs.size()]
+				var pick = dirs[randi() % dirs.size()]
+				# validate the random pick using try_move_tile
+				if try_move_tile(pick, player_pos):
+					move_dir = pick
+				else:
+					move_dir = Vector2.ZERO
 
-		# Attempt to move (allow stepping on player)
-		if try_move_tile(move_dir, player_pos):
+		# --- Move if target_position was set by try_move_tile ---
+		# try_move_tile already sets target_position and direction when it returns true.
+		if move_dir != Vector2.ZERO and target_position != global_position:
 			GlobalData.occupied_tiles.append(grid_pos(target_position))
 			await move_towards_target()
 
-	# End turn
+	# End turn bookkeeping
 	GlobalData.enemy_turns_remaining -= 1
 	if GlobalData.enemy_turns_remaining <= 0:
 		GlobalData.enemies_taking_turns = false
+
+
+
 
 
 
