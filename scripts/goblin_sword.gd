@@ -6,3 +6,4 @@ func _ready():
 	hit_points = 4
 	max_hit_points = hit_points
 	move_speed = 64
+	detection_radius = 64
