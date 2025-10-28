@@ -1,7 +1,8 @@
-[gd_scene load_steps=40 format=3 uid="uid://derahvo7471f8"]
+[gd_scene load_steps=42 format=3 uid="uid://derahvo7471f8"]
 
 [ext_resource type="Script" uid="uid://5mm06rx5tkj2" path="res://scripts/rat.gd" id="1_77a1s"]
 [ext_resource type="Texture2D" uid="uid://76y476sr0r62" path="res://assets/enemies/1/D_Idle.png" id="2_acf8p"]
+[ext_resource type="PackedScene" uid="uid://32d3j8tgyhl1" path="res://scenes/health_book.tscn" id="2_nkgqy"]
 [ext_resource type="Texture2D" uid="uid://qiw2874mm757" path="res://assets/enemies/1/S_Idle.png" id="4_nkgqy"]
 [ext_resource type="Texture2D" uid="uid://c6ybyb2p876x1" path="res://assets/enemies/1/U_Idle.png" id="5_d2y1h"]
 [ext_resource type="Texture2D" uid="uid://b0xxmjjh2fo7b" path="res://assets/enemies/1/D_Walk.png" id="6_a0rjm"]
@@ -1228,8 +1229,12 @@ _data = {
 &"walk_up": SubResource("Animation_e3ywk")
 }
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u8fq5"]
+bg_color = Color(1, 0, 0, 0.490196)
+
 [node name="Rat" type="CharacterBody2D"]
 script = ExtResource("1_77a1s")
+book_scene = ExtResource("2_nkgqy")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_acf8p")
@@ -1256,6 +1261,15 @@ wait_time = 0.21
 wait_time = 0.05
 
 [node name="DeathTimer" type="Timer" parent="."]
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -8.0
+offset_top = -12.0
+offset_right = 24.0
+offset_bottom = -8.0
+scale = Vector2(0.5, 0.5)
+theme_override_styles/fill = SubResource("StyleBoxFlat_u8fq5")
+show_percentage = false
 
 [connection signal="timeout" from="AttackTimer" to="." method="_on_attack_timer_timeout"]
 [connection signal="timeout" from="MidSwingTimer" to="." method="_on_mid_swing_timer_timeout"]

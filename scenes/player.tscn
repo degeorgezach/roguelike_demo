@@ -1246,13 +1246,15 @@ libraries = {
 }
 
 [node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(1.5, 1.5)
 script = ExtResource("17_fulsm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_fjrip")
 
 [node name="HealthBar" parent="." instance=ExtResource("8_smehm")]
-position = Vector2(-133, -146)
+position = Vector2(-80, -96)
+scale = Vector2(0.75, 0.75)
 
 [node name="HitBox" type="Area2D" parent="."]
 

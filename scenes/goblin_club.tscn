@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://wkckfxvhq8hd"]
+[gd_scene load_steps=41 format=3 uid="uid://wkckfxvhq8hd"]
 
 [ext_resource type="Texture2D" uid="uid://deimrt7v8qqvi" path="res://assets/enemies/2/D_Idle.png" id="1_mrc4x"]
 [ext_resource type="Script" uid="uid://k3q6krxck357" path="res://scripts/goblin_club.gd" id="1_s7q11"]
@@ -1228,6 +1228,9 @@ _data = {
 &"walk_up": SubResource("Animation_7hhm8")
 }
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r22a6"]
+bg_color = Color(1, 0, 0, 0.490196)
+
 [node name="Goblin_Club" type="CharacterBody2D"]
 script = ExtResource("1_s7q11")
 
@@ -1256,6 +1259,15 @@ wait_time = 0.3
 wait_time = 0.05
 
 [node name="DeathTimer" type="Timer" parent="."]
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -8.0
+offset_top = -12.0
+offset_right = 24.0
+offset_bottom = -8.0
+scale = Vector2(0.5, 0.5)
+theme_override_styles/fill = SubResource("StyleBoxFlat_r22a6")
+show_percentage = false
 
 [connection signal="timeout" from="AttackTimer" to="." method="_on_attack_timer_timeout"]
 [connection signal="timeout" from="MidSwingTimer" to="." method="_on_mid_swing_timer_timeout"]

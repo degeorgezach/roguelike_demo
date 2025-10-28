@@ -35,6 +35,8 @@ var right = false
 var is_chasing = false
 var is_returning = false
 
+@export var book_scene: PackedScene
+
 
 # --------------------------------------------------
 # Setup
@@ -305,6 +307,8 @@ func hurt(value):
 
 	pendingDamage = value
 	var newHP = hit_points - pendingDamage
+	
+	$HealthBar.value = newHP
 
 	if newHP <= 0:
 		$AnimationPlayer.stop()
@@ -363,7 +367,6 @@ func die() -> void:
 	else:
 		anim_name = "death_down"
 
-	print("Playing animation:", anim_name)
 	anim.play(anim_name)
 
 	$DeathTimer.start()
@@ -555,6 +558,18 @@ func attack_action() -> void:
 
 
 
+
+
+# --------------------------------------------------
+# Health Bar
+# --------------------------------------------------
+
+
+
+
+
+
+
 # --------------------------------------------------
 # Timers
 # --------------------------------------------------
@@ -603,11 +618,17 @@ func _on_death_timer_timeout():
 	$DeathTimer.stop()
 	dead = true
 	dying = false
+	
+	if book_scene:
+		var book_instance = book_scene.instantiate()
+		book_instance.global_position = global_position
+		get_tree().current_scene.add_child(book_instance)
 
 	# Begin respawn timer and cleanup
 	#$RespawnTimer.wait_time = respawn_time
 	#$RespawnTimer.start()
 	deactivate_enemy()
+	
 
 
 func _on_dying_timer_timeout():
