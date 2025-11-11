@@ -1234,6 +1234,7 @@ size = Vector2(16, 16)
 radius = 12.0
 
 [node name="Player" type="CharacterBody2D"]
+z_index = 10
 script = ExtResource("1_fjrip")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

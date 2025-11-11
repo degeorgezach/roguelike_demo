@@ -232,10 +232,15 @@ func update_animation():
 # Attack
 # -----------------------------
 func attack_action():
+	if attacking:
+		return
+	attacking = true
 	idling = false
+
 	if enemies.size() > 0:
 		attack(enemies[0])
 	else:
+		# play attack animation even if not hitting an enemy
 		if direction.y > 0:
 			anim.play("attack_down")
 		elif direction.y < 0:
@@ -244,7 +249,9 @@ func attack_action():
 			anim.play("attack_left")
 		elif direction.x > 0:
 			anim.play("attack_right")
+
 	$AttackTimer.start()
+
 
 
 func attack(body):

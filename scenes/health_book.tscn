@@ -135,7 +135,7 @@ _data = {
 size = Vector2(15, 15)
 
 [node name="HealthBook" type="Node2D"]
-z_index = 11
+z_index = 9
 script = ExtResource("1_cf51q")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

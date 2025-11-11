@@ -6,7 +6,7 @@ func _ready():
 
 
 func _on_area_2d_body_entered(body: Node2D) -> void:
-	if body is Player:
+	if body is Player and GlobalData.hit_points < GlobalData.max_health:
 		$AnimationPlayer.play("open")
 		$Timer.start()
 
