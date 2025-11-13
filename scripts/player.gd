@@ -162,7 +162,7 @@ func handle_enemy_turns() -> void:
 	GlobalData.populate_occupied_tiles()
 
 	for enemy in enemy_nodes:
-		if enemy and enemy.has_method("take_turn"):
+		if enemy and enemy.has_method("take_turn") and enemy.is_visible_on_screen:
 			# Pass both current player position and last player position
 			await enemy.take_turn(global_position, last_player_pos)
 			# Update last_player_pos so next enemy can follow accurately
@@ -234,10 +234,12 @@ func update_animation():
 func attack_action():
 	if attacking:
 		return
+
 	attacking = true
 	idling = false
 
-	if enemies.size() > 0:
+	var has_target = enemies.size() > 0
+	if has_target:
 		attack(enemies[0])
 	else:
 		# play attack animation even if not hitting an enemy
@@ -250,33 +252,31 @@ func attack_action():
 		elif direction.x > 0:
 			anim.play("attack_right")
 
-	$AttackTimer.start()
+		$AttackTimer.start()
 
 
 
 func attack(body):
-	if not attacking:
-		attacking = true
-		$AttackTimer.start()
-
-		var diff = body.global_position - global_position
-		if abs(diff.x) > abs(diff.y):
-			if diff.x > 0:
-				direction = Vector2.RIGHT
-				anim.play("attack_right")
-			else:
-				direction = Vector2.LEFT
-				anim.play("attack_left")
+	var diff = body.global_position - global_position
+	if abs(diff.x) > abs(diff.y):
+		if diff.x > 0:
+			direction = Vector2.RIGHT
+			anim.play("attack_right")
 		else:
-			if diff.y > 0:
-				direction = Vector2.DOWN
-				anim.play("attack_down")
-			else:
-				direction = Vector2.UP
-				anim.play("attack_up")
+			direction = Vector2.LEFT
+			anim.play("attack_left")
+	else:
+		if diff.y > 0:
+			direction = Vector2.DOWN
+			anim.play("attack_down")
+		else:
+			direction = Vector2.UP
+			anim.play("attack_up")
 
-		body.hurt(attack_power)
-		await handle_enemy_turns()
+	$AttackTimer.start()
+	body.hurt(attack_power)
+	await handle_enemy_turns()
+
 
 
 func _on_attack_timer_timeout():

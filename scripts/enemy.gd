@@ -35,6 +35,8 @@ var right = false
 var is_chasing = false
 var is_returning = false
 
+var is_visible_on_screen = false
+
 @export var book_scene: PackedScene
 
 
@@ -47,9 +49,17 @@ func _ready():
 	target_position = global_position
 	anim.play("idle_down")
 	add_to_group("Enemies")
+	var notifier = $VisibleOnScreenNotifier2D
+	notifier.connect("screen_entered", Callable(self, "_on_screen_entered"))
+	notifier.connect("screen_exited", Callable(self, "_on_screen_exited"))
 
 
 # --- Helpers ---
+func _on_screen_entered():
+	is_visible_on_screen = true
+
+func _on_screen_exited():
+	is_visible_on_screen = false
 
 # Return integer grid Vector2 (same basis as your grid_pos)
 func _grid_vec(v: Vector2) -> Vector2:

@@ -1236,6 +1236,8 @@ bg_color = Color(1, 0, 0, 0.490196)
 script = ExtResource("1_77a1s")
 book_scene = ExtResource("2_nkgqy")
 
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_acf8p")
 hframes = 4
