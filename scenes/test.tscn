@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=4 uid="uid://dxv2ysyox0vtw"]
+[gd_scene load_steps=21 format=4 uid="uid://dxv2ysyox0vtw"]
 
 [ext_resource type="PackedScene" uid="uid://drrr242lq0cr2" path="res://scenes/player.tscn" id="1_errlg"]
 [ext_resource type="Script" uid="uid://6etu4wnxjsqn" path="res://scripts/test.gd" id="1_iyx0m"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://oi8nquxmgeol" path="res://scenes/door_single_left.tscn" id="13_xrtyr"]
 [ext_resource type="PackedScene" uid="uid://b5bxjerbvqpi5" path="res://scenes/crate_3.tscn" id="14_7mbro"]
 [ext_resource type="PackedScene" uid="uid://derahvo7471f8" path="res://scenes/rat.tscn" id="15_ff6ho"]
+[ext_resource type="PackedScene" uid="uid://b0v8bd7203ok6" path="res://scenes/goblin_shaman.tscn" id="16_7yos8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yk7ts"]
 texture = ExtResource("2_bl13t")
@@ -276,35 +277,5 @@ position = Vector2(40, 56)
 [node name="Rat" parent="." instance=ExtResource("15_ff6ho")]
 position = Vector2(440, 168)
 
-[node name="Rat2" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(424, 168)
-
-[node name="Rat3" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(408, 168)
-
-[node name="Rat4" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(408, 152)
-
-[node name="Rat5" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(424, 152)
-
-[node name="Rat6" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(440, 152)
-
-[node name="Rat7" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(440, 136)
-
-[node name="Rat8" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(424, 136)
-
-[node name="Rat9" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(408, 136)
-
-[node name="Rat10" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(408, 120)
-
-[node name="Rat11" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(424, 120)
-
-[node name="Rat12" parent="." instance=ExtResource("15_ff6ho")]
-position = Vector2(440, 120)
+[node name="Goblin_Shaman" parent="." instance=ExtResource("16_7yos8")]
+position = Vector2(24, 120)

@@ -1282,6 +1282,8 @@ scale = Vector2(0.5, 0.5)
 theme_override_styles/fill = SubResource("StyleBoxFlat_q0042")
 show_percentage = false
 
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
 [connection signal="timeout" from="AttackTimer" to="." method="_on_attack_timer_timeout"]
 [connection signal="timeout" from="MidSwingTimer" to="." method="_on_mid_swing_timer_timeout"]
 [connection signal="timeout" from="HurtTimer" to="." method="_on_hurt_timer_timeout"]

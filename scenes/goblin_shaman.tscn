@@ -1,23 +1,24 @@
-[gd_scene load_steps=41 format=3 uid="uid://wkckfxvhq8hd"]
+[gd_scene load_steps=42 format=3 uid="uid://b0v8bd7203ok6"]
 
-[ext_resource type="Texture2D" uid="uid://deimrt7v8qqvi" path="res://assets/enemies/2/D_Idle.png" id="1_mrc4x"]
-[ext_resource type="Script" uid="uid://k3q6krxck357" path="res://scripts/goblin_club.gd" id="1_s7q11"]
-[ext_resource type="Texture2D" uid="uid://bpc5i6x6gqiv8" path="res://assets/enemies/2/U_Idle.png" id="2_y1i1u"]
-[ext_resource type="Texture2D" uid="uid://bnei0n140m8q" path="res://assets/enemies/2/S_Idle.png" id="3_162f7"]
-[ext_resource type="Texture2D" uid="uid://bg2xubqfu72xx" path="res://assets/enemies/2/D_Walk.png" id="4_jtjcf"]
-[ext_resource type="Texture2D" uid="uid://dqw1ul1d8w421" path="res://assets/enemies/2/U_Walk.png" id="5_162f7"]
-[ext_resource type="Texture2D" uid="uid://cx1m56l2nrimg" path="res://assets/enemies/2/S_Walk.png" id="6_jtjcf"]
-[ext_resource type="Texture2D" uid="uid://bsm8200o8fl4a" path="res://assets/enemies/2/D_Attack.png" id="8_wiid5"]
-[ext_resource type="Texture2D" uid="uid://cmjtmv530c0rn" path="res://assets/enemies/2/U_Attack.png" id="9_fdq4y"]
-[ext_resource type="Texture2D" uid="uid://dqh16aqqw8vj" path="res://assets/enemies/2/S_Attack.png" id="10_k828c"]
-[ext_resource type="Texture2D" uid="uid://21t6xvw05wwi" path="res://assets/enemies/2/D_Hurt.png" id="11_r22a6"]
-[ext_resource type="Texture2D" uid="uid://cp83qvq73f23j" path="res://assets/enemies/2/U_Hurt.png" id="12_2hike"]
-[ext_resource type="Texture2D" uid="uid://ci2h8wcpnxe61" path="res://assets/enemies/2/S_Hurt.png" id="13_sgi5f"]
-[ext_resource type="Texture2D" uid="uid://j16cd7aigjqy" path="res://assets/enemies/2/D_Death.png" id="14_v5aee"]
-[ext_resource type="Texture2D" uid="uid://dtxim8fywc3jg" path="res://assets/enemies/2/U_Death.png" id="15_hen8e"]
-[ext_resource type="Texture2D" uid="uid://d1rns74axud76" path="res://assets/enemies/2/S_Death.png" id="16_g7fj7"]
+[ext_resource type="Script" uid="uid://c3mdehnmvqaaj" path="res://scripts/goblin_shaman.gd" id="1_8yuoc"]
+[ext_resource type="Texture2D" uid="uid://deimrt7v8qqvi" path="res://assets/enemies/2/D_Idle.png" id="2_pisp2"]
+[ext_resource type="Texture2D" uid="uid://ci0b1c0bexmxc" path="res://assets/enemies/4/D_Attack.png" id="3_8yuoc"]
+[ext_resource type="Texture2D" uid="uid://by6tnx7qvkedq" path="res://assets/enemies/4/S_Attack.png" id="4_pisp2"]
+[ext_resource type="Texture2D" uid="uid://bn1wb3ny5vix4" path="res://assets/enemies/4/U_Attack.png" id="5_qin1v"]
+[ext_resource type="Texture2D" uid="uid://doaj4jx5fte4f" path="res://assets/enemies/4/D_Death.png" id="6_cbel5"]
+[ext_resource type="Texture2D" uid="uid://3o6jyelbhtsx" path="res://assets/enemies/4/S_Death.png" id="7_nhduq"]
+[ext_resource type="Texture2D" uid="uid://mgx84e7ct1ln" path="res://assets/enemies/4/U_Death.png" id="8_j31mm"]
+[ext_resource type="Texture2D" uid="uid://b5ob6t1rue5k5" path="res://assets/enemies/4/D_Hurt.png" id="9_au67o"]
+[ext_resource type="Texture2D" uid="uid://bnri3pkh302cq" path="res://assets/enemies/4/S_Hurt.png" id="10_hjb0g"]
+[ext_resource type="Texture2D" uid="uid://dsw34nka1ua3y" path="res://assets/enemies/4/U_Hurt.png" id="11_ebn4d"]
+[ext_resource type="Texture2D" uid="uid://2lxe5a7ted42" path="res://assets/enemies/4/D_Idle.png" id="12_ctm0q"]
+[ext_resource type="Texture2D" uid="uid://b6cyn4d57o1t3" path="res://assets/enemies/4/S_Idle.png" id="13_pyvj7"]
+[ext_resource type="Texture2D" uid="uid://blim40go5gdnw" path="res://assets/enemies/4/U_Idle.png" id="14_qldta"]
+[ext_resource type="Texture2D" uid="uid://le1jfrwsmxkf" path="res://assets/enemies/4/D_Walk.png" id="15_p2ogt"]
+[ext_resource type="Texture2D" uid="uid://cliy3o7m2wo06" path="res://assets/enemies/4/S_Walk.png" id="16_ya5c7"]
+[ext_resource type="Texture2D" uid="uid://c5h2rx2dyn3ww" path="res://assets/enemies/4/U_Walk.png" id="17_06t6i"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_r22a6"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q0042"]
 size = Vector2(16, 16)
 
 [sub_resource type="Animation" id="Animation_m3sl7"]
@@ -32,7 +33,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("1_mrc4x")]
+"values": [ExtResource("2_pisp2")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -96,7 +97,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("8_wiid5")]
+"values": [ExtResource("3_8yuoc")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -148,7 +149,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("10_k828c")]
+"values": [ExtResource("4_pisp2")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -212,7 +213,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("10_k828c")]
+"values": [ExtResource("4_pisp2")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -276,7 +277,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("9_fdq4y")]
+"values": [ExtResource("5_qin1v")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -328,7 +329,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("14_v5aee")]
+"values": [ExtResource("6_cbel5")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -380,7 +381,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("16_g7fj7")]
+"values": [ExtResource("7_nhduq")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -444,7 +445,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("16_g7fj7")]
+"values": [ExtResource("7_nhduq")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -508,7 +509,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("15_hen8e")]
+"values": [ExtResource("8_j31mm")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -560,7 +561,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("11_r22a6")]
+"values": [ExtResource("9_au67o")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -612,7 +613,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("13_sgi5f")]
+"values": [ExtResource("10_hjb0g")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -676,7 +677,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("13_sgi5f")]
+"values": [ExtResource("10_hjb0g")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -740,7 +741,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("12_2hike")]
+"values": [ExtResource("11_ebn4d")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -793,7 +794,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("1_mrc4x")]
+"values": [ExtResource("12_ctm0q")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -819,6 +820,18 @@ tracks/2/keys = {
 "update": 1,
 "values": [0, 1, 2, 3]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Sprite2D:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_wiid5"]
 resource_name = "idle_left"
@@ -834,7 +847,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("3_162f7")]
+"values": [ExtResource("13_pyvj7")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -887,7 +900,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("3_162f7")]
+"values": [ExtResource("13_pyvj7")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -940,7 +953,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("2_y1i1u")]
+"values": [ExtResource("14_qldta")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -981,7 +994,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("4_jtjcf")]
+"values": [ExtResource("15_p2ogt")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1034,7 +1047,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("6_jtjcf")]
+"values": [ExtResource("16_ya5c7")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1099,7 +1112,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("6_jtjcf")]
+"values": [ExtResource("16_ya5c7")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1164,7 +1177,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("5_162f7")]
+"values": [ExtResource("17_06t6i")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1228,18 +1241,18 @@ _data = {
 &"walk_up": SubResource("Animation_7hhm8")
 }
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r22a6"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q0042"]
 bg_color = Color(1, 0, 0, 0.490196)
 
-[node name="Goblin_Club" type="CharacterBody2D"]
-script = ExtResource("1_s7q11")
+[node name="Goblin_Shaman" type="CharacterBody2D"]
+script = ExtResource("1_8yuoc")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_mrc4x")
+texture = ExtResource("2_pisp2")
 hframes = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_r22a6")
+shape = SubResource("RectangleShape2D_q0042")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -1266,7 +1279,7 @@ offset_top = -12.0
 offset_right = 24.0
 offset_bottom = -8.0
 scale = Vector2(0.5, 0.5)
-theme_override_styles/fill = SubResource("StyleBoxFlat_r22a6")
+theme_override_styles/fill = SubResource("StyleBoxFlat_q0042")
 show_percentage = false
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
